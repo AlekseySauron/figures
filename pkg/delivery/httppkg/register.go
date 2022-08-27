@@ -34,22 +34,20 @@ func (h *Handler) Posting(c *gin.Context) {
 		return
 	}
 
-	if newTask.Figure == "square" {
-		// g := mathpkg.Square{newTask.H, newTask.W}
-		g := mathpkg.Square{newTask.H, newTask.W}
-	} else if newTask.Figure == "circle" {
-		g := mathpkg.Circle{newTask.H}
-	} else if newTask.Figure == "rectangle" {
-		g := mathpkg.Rectangle{newTask.H, newTask.W}
-	} else if newTask.Figure == "triangle" {
-		g := mathpkg.Triangle{newTask.H, newTask.W}
-	}
+	figure := mathpkg.Square{H: newTask.H, W: newTask.W}
+	// if newTask.Figure == "square" {
+	// 	figure := mathpkg.Square{H: newTask.H, W: newTask.W}
+	// } else if newTask.Figure == "circle" {
+	// 	figure := mathpkg.Circle{R: newTask.H}
+	// } else if newTask.Figure == "rectangle" {
+	// 	figure := mathpkg.Rectangle{H: newTask.H, W: newTask.W}
+	// } else if newTask.Figure == "triangle" {
+	// 	figure := mathpkg.Triangle{H: newTask.H, W: newTask.W}
+	// } else {
+	// 	c.JSON(http.StatusBadRequest, "unknow Figure")
+	// 	return
+	// }
 
-	// c.JSON(http.StatusOK, g.area())
-	c.JSON(http.StatusOK, measure(g))
+	c.JSON(http.StatusOK, mathpkg.Measure(figure))
 
-}
-
-func measure(g mathpkg.Geometry) {
-	return g.Area()
 }

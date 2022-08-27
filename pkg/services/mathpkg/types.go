@@ -1,7 +1,7 @@
 package mathpkg
 
 type Square struct {
-	W, H float64
+	H, W float64
 }
 
 type Circle struct {
@@ -9,13 +9,14 @@ type Circle struct {
 }
 
 type Rectangle struct {
-	W, H float64
+	H, W float64
 }
 
 type Triangle struct {
-	W, H float64
+	H, W float64
 }
 
 type Geometry interface {
+	//mathpkg.
 	Area() float64
 }
