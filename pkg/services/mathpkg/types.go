@@ -17,6 +17,9 @@ type Triangle struct {
 }
 
 type Geometry interface {
-	//mathpkg.
 	Area() float64
+}
+
+func NewSquare(H float64, W float64) Geometry {
+	return &Square{H: H, W: W}
 }
