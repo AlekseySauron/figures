@@ -1,8 +1,10 @@
 package httppkg
 
 import (
+	"fmt"
 	"net/http"
 
+	"github.com/AlekseySauron/figures/pkg/delivery/telegrampkg"
 	"github.com/AlekseySauron/figures/pkg/services/mathpkg"
 	"github.com/gin-gonic/gin"
 )
@@ -56,6 +58,18 @@ func (h *Handler) Posting(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, mathpkg.Measure(figure))
+	res := mathpkg.Measure(figure)
+	c.JSON(http.StatusOK, res)
+
+	newBot := telegrampkg.NewBot()
+	// bot, err := tgbotapi.NewBotAPI("1901733643:AAHlKkQJrCaKS1c1SZigHXq6t8CUXO7eeWs")
+	// if err != nil {
+	// 	return
+	// }
+
+	// msg := tgbotapi.NewMessage(421964311, fmt.Sprint(res))
+	newBot.Send(fmt.Sprint(res))
+	//msg.ReplyToMessageID = update.Message.MessageID
+	// bot.Send(msg)
 
 }
