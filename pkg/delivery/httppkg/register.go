@@ -58,18 +58,18 @@ func (h *Handler) Posting(c *gin.Context) {
 		return
 	}
 
-	res := mathpkg.Measure(figure)
-	c.JSON(http.StatusOK, res)
+	myChan := make(chan float64)
 
-	newBot := telegrampkg.NewBot()
-	// bot, err := tgbotapi.NewBotAPI("1901733643:AAHlKkQJrCaKS1c1SZigHXq6t8CUXO7eeWs")
-	// if err != nil {
-	// 	return
-	// }
+	go func() {
+		myChan <- mathpkg.Measure(figure)
+	}()
 
-	// msg := tgbotapi.NewMessage(421964311, fmt.Sprint(res))
-	newBot.Send(fmt.Sprint(res))
-	//msg.ReplyToMessageID = update.Message.MessageID
-	// bot.Send(msg)
+	go func() {
+		res := <-myChan
+		c.JSON(http.StatusOK, res)
+
+		newBot := telegrampkg.NewBot()
+		newBot.Send(fmt.Sprint(res))
+	}()
 
 }
