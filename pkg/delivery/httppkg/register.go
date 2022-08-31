@@ -9,12 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// type Task struct {
-// 	Figure string  `json:"figure"`
-// 	H      float64 `json:"h"`
-// 	W      float64 `json:"w"`
-// }
-
 type Handler struct {
 }
 
@@ -36,40 +30,28 @@ func (h *Handler) Posting(c *gin.Context) {
 		return
 	}
 
-	//figure := mathpkg.Square{H: newTask.H, W: newTask.W}
-
 	var figure mathpkg.Geometry
 
 	if newTask.Figure == "square" {
-		//figure = mathpkg.Square{H: newTask.H, W: newTask.W}
-		// figure = mathpkg.NewSquare(newTask)
 		figure = mathpkg.NewSquare(newTask.H, newTask.W)
 	} else if newTask.Figure == "circle" {
-		// figure = mathpkg.Circle{R: newTask.H}
 		figure = mathpkg.NewCircle(newTask.H)
 	} else if newTask.Figure == "rectangle" {
-		// figure = mathpkg.Rectangle{H: newTask.H, W: newTask.W}
 		figure = mathpkg.NewRectangle(newTask.H, newTask.W)
 	} else if newTask.Figure == "triangle" {
-		// figure = mathpkg.Triangle{H: newTask.H, W: newTask.W}
 		figure = mathpkg.NewTriangle(newTask.H, newTask.W)
 	} else {
 		c.JSON(http.StatusBadRequest, "unknow Figure")
 		return
 	}
 
-	myChan := make(chan float64)
+	chat_id := c.Request.Header.Get("chat_id")
 
-	go func() {
-		myChan <- mathpkg.Measure(figure)
-	}()
+	go func(chat_id string, figure mathpkg.Geometry, figureName string) {
+		res := mathpkg.Measure(figure)
 
-	go func() {
-		res := <-myChan
-		c.JSON(http.StatusOK, res)
+		telegrampkg.Send(chat_id, fmt.Sprintf("Result for figure %s: %f", figureName, res))
+	}(chat_id, figure, newTask.Figure)
 
-		newBot := telegrampkg.NewBot()
-		newBot.Send(fmt.Sprint(res))
-	}()
-
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

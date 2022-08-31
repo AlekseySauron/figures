@@ -29,7 +29,3 @@ func (g Triangle) Area() float64 {
 func Measure(g Geometry) float64 {
 	return g.Area()
 }
-
-// func Area(g Geometry) {
-// 	return g.Area()
-// }
