@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="windows-1251">
+</head>
+
+<body>
+
+	<h1>Вычисление:</h1>
+
+	<form method="post">
+		
+		chat_id &nbsp;
+		<input name="chat_id" type="number" value="421964311"/>&nbsp;
+
+
+		<p>Фигуры&nbsp;
+
+			<select id="figure" name="Figures">
+                <option selected="selected" value="square">square</option>
+                <option selected="selected" value="circle">circle</option>
+                <option selected="selected" value="rectangle">rectangle</option>
+                <option selected="selected" value="triangle">triangle</option>
+            </select>&nbsp;
+
+		<p>
+			<div id="size">
+				Ширина &nbsp;
+				<input name="width" type="number" />&nbsp;
+				Длина &nbsp;
+				<input name="height" type="number" />&nbsp;
+			</div>
+			<div id="radius">
+				Радиус
+				<input name="radius" type="number" />
+			</div>
+		</p>
+
+		<input name="submit" type="submit" value="submit" />
+
+		РЕЗУЛЬТАТ :{{ .result }}
+
+	</form>
+
+	<script>
+        const figureEl = document.getElementById('figure');
+        const sizeEl = document.getElementById('size');
+        const radiusEl = document.getElementById('radius');
+        const eHandler = (figure) => {
+            if (figure === 'circle') {
+                sizeEl.style.display = "none";
+                radiusEl.style.display = "block";
+            } else {
+                sizeEl.style.display = "block";
+                radiusEl.style.display = "none";
+            }
+        }
+        document.addEventListener('change', (event) => { eHandler(event.target.value) })
+        eHandler(figureEl.value)
+
+    </script>
+
+</body>
+
+</html>

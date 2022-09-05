@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/AlekseySauron/figures/app"
 	"github.com/spf13/viper"
@@ -14,6 +15,7 @@ func main() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		fmt.Println("Ошибка viper", err.Error())
+		log.Fatal("Ошибка viper", err)
 		return
 	}
 

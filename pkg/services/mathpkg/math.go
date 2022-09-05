@@ -22,7 +22,7 @@ func (g Rectangle) Area() float64 {
 
 func (g Triangle) Area() float64 {
 
-	return (1 / 2) * g.H * g.W
+	return 0.5 * g.H * g.W
 
 }
 
