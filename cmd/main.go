@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	viper.AddConfigPath("..")
+	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	err := viper.ReadInConfig()
