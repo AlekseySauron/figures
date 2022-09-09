@@ -9,6 +9,14 @@
 
 	<h1>Вычисление:</h1>
 
+	{{if .Err}}
+		<div style="color: red;"> {{.Err}} </div>
+	{{else}}
+		<div>
+			{{ myFunc }}
+		</div>
+	{{end}}
+
 	<form method="post">
 		
 		chat_id &nbsp;

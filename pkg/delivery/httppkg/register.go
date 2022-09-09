@@ -2,7 +2,6 @@ package httppkg
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -21,9 +20,12 @@ func NewHandler() *Handler {
 func Register(router *gin.Engine) {
 	h := NewHandler()
 
-	//router.POST("/json", h.Posting)
+	router.FuncMap["myFunc"] = func(i string) string {
+		return "Hello"
+	}
 
-	router.LoadHTMLGlob("../templates/*")
+	router.LoadHTMLGlob("./templates/*")
+	//router.LoadHTMLGlob("./templates/*")
 	router.GET("/", h.GettingHtml)
 	router.POST("/", h.PostingHtml)
 }
@@ -37,12 +39,17 @@ func (h *Handler) GettingHtml(c *gin.Context) {
 
 }
 
+type BasicError struct {
+	Err string
+}
+
 func (h *Handler) PostingHtml(c *gin.Context) {
 	figure := c.PostForm("Figures")
 
 	chat_id := c.PostForm("chat_id")
 	if chat_id == "" {
-		c.JSON(http.StatusBadRequest, "chat_id не указан")
+		//c.JSON(http.StatusBadRequest, "chat_id не указан")
+		c.HTML(http.StatusOK, "index.html", BasicError{Err: "chat_id не указан"})
 		return
 	}
 
@@ -50,32 +57,37 @@ func (h *Handler) PostingHtml(c *gin.Context) {
 	if figure == "circle" {
 		radius, err := strconv.ParseFloat(c.PostForm("radius"), 64)
 		if err != nil {
-			log.Fatal("Ошибка формата radius")
+			// log.Fatal("Ошибка формата radius")
+			c.HTML(http.StatusOK, "index.html", BasicError{Err: "Ошибка формата radius"})
 		}
 
 		newTask = Task{figure, radius, 0}
 	} else {
 		width, err := strconv.ParseFloat(c.PostForm("width"), 64)
 		if err != nil {
-			log.Fatal("Ошибка формата width")
+			//log.Fatal("Ошибка формата width")
+			c.HTML(http.StatusOK, "index.html", BasicError{Err: "Ошибка формата width"})
 		}
 
 		height, err := strconv.ParseFloat(c.PostForm("height"), 64)
 		if err != nil {
-			log.Fatal("Ошибка формата height")
+			// log.Fatal("Ошибка формата height")
+			c.HTML(http.StatusOK, "index.html", BasicError{Err: "Ошибка формата height"})
 		}
 
 		newTask = Task{figure, height, width}
 	}
 
-	result := procInData(newTask, c, chat_id)
+	// result := procInData(newTask, c, chat_id)
+	result := <-procInData(newTask, c, chat_id)
 
 	c.HTML(http.StatusOK, "index.html", gin.H{"result": result})
 }
 
-func procInData(newTask Task, c *gin.Context, chat_id string) float64 {
+func procInData(newTask Task, c *gin.Context, chat_id string) chan float64 {
 	var figure mathpkg.Geometry
-	var Result float64
+	//var Result float64
+	ch := make(chan float64)
 
 	if newTask.Figure == "square" {
 		figure = mathpkg.NewSquare(newTask.H, newTask.W)
@@ -87,30 +99,24 @@ func procInData(newTask Task, c *gin.Context, chat_id string) float64 {
 		figure = mathpkg.NewTriangle(newTask.H, newTask.W)
 	} else {
 		c.JSON(http.StatusBadRequest, "unknow Figure")
-		return 0
+		return ch
 	}
 
-	// chat_id := c.Request.Header.Get("chat_id")
-	// if chat_id == "" {
-	// 	c.JSON(http.StatusBadRequest, "chat_id не указан")
-	// 	return
-	// }
-
-	// ch := make(chan float64)
-
 	go func(chat_id string, figure mathpkg.Geometry, figureName string) {
-		Result = mathpkg.Measure(figure)
+		//Result = mathpkg.Measure(figure)
+		res := mathpkg.Measure(figure)
 
-		telegrampkg.Send(chat_id, fmt.Sprintf("Result for figure %s: %f", figureName, Result))
+		telegrampkg.Send(chat_id, fmt.Sprintf("Result for figure %s: %f", figureName, res))
 
-		// ch <- result
-		// close(ch)
+		ch <- res
+		close(ch)
 	}(chat_id, figure, newTask.Figure)
 
 	// result <- ch
 
 	//fmt.Println("result = ", Result)
-	return Result
+	//return Result
+	return ch
 }
 
 func (h *Handler) Posting(c *gin.Context) {
